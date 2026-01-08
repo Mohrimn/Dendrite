@@ -202,17 +202,17 @@ const searchIndex = new MiniSearch({
 
 ### Phase 5: Graph Visualization ✅ COMPLETED
 1. ✅ Set up Three.js scene with camera, lights, controls
-2. 🔲 Add post-processing (UnrealBloomPass for glow) - deferred
+2. ✅ Add post-processing (UnrealBloomPass for glow)
 3. ✅ Integrate d3-force-3d for physics simulation
 4. ✅ Create node geometries (spheres with emissive materials)
 5. ✅ Create edge geometries (lines)
-6. 🔲 Add ambient particles for atmosphere - deferred
+6. ✅ Add ambient particles for atmosphere
 7. ✅ Implement raycasting for hover/click interactions
 8. ✅ Build GraphControls (zoom, reset, reheat simulation)
 9. ✅ Build GraphLegend (node type colors)
 10. ✅ Build GraphNodeTooltip (hover tooltip + detail panel)
-11. 🔲 Add zoom-to-node on click - deferred
-12. 🔲 Add filter by cluster/type - deferred
+11. ✅ Add zoom-to-node on click
+12. ✅ Add filter by cluster/type
 
 **Implementation Notes**:
 - Core graph visualization working with Three.js + d3-force-3d
