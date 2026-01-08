@@ -1,9 +1,14 @@
 // ABOUTME: Graph visualization page for the knowledge scrapbook
 // ABOUTME: Displays 3D force-directed graph of all scraps and connections
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Header } from '@/components/layout';
-import { GraphCanvas, GraphControls, GraphLegend } from '@/components/graph';
+import {
+  GraphCanvas,
+  GraphControls,
+  GraphLegend,
+  type GraphCanvasHandle,
+} from '@/components/graph';
 import { useStore } from '@/store';
 import { ScrapDetail } from '@/components/scrap';
 
@@ -11,6 +16,7 @@ export function GraphPage() {
   const scraps = useStore((state) => state.scraps);
   const [selectedScrapId, setSelectedScrapId] = useState<string | null>(null);
   const [hoveredScrapId, setHoveredScrapId] = useState<string | null>(null);
+  const graphRef = useRef<GraphCanvasHandle>(null);
 
   const selectedScrap = scraps.find((s) => s.id === selectedScrapId);
   const hoveredScrap = scraps.find((s) => s.id === hoveredScrapId);
@@ -25,6 +31,22 @@ export function GraphPage() {
 
   const handleCloseDetail = useCallback(() => {
     setSelectedScrapId(null);
+  }, []);
+
+  const handleZoomIn = useCallback(() => {
+    graphRef.current?.zoomIn();
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    graphRef.current?.zoomOut();
+  }, []);
+
+  const handleResetView = useCallback(() => {
+    graphRef.current?.resetView();
+  }, []);
+
+  const handleReheat = useCallback(() => {
+    graphRef.current?.reheat();
   }, []);
 
   return (
@@ -67,6 +89,7 @@ export function GraphPage() {
         ) : (
           <>
             <GraphCanvas
+              ref={graphRef}
               scraps={scraps}
               onNodeClick={handleNodeClick}
               onNodeHover={handleNodeHover}
@@ -75,7 +98,12 @@ export function GraphPage() {
 
             {/* Controls */}
             <div className="absolute top-4 right-4">
-              <GraphControls />
+              <GraphControls
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onResetView={handleResetView}
+                onReheat={handleReheat}
+              />
             </div>
 
             {/* Legend */}
