@@ -38,6 +38,7 @@ export interface GraphCanvasHandle {
   zoomOut: () => void;
   resetView: () => void;
   reheat: () => void;
+  zoomToNode: (nodeId: string) => void;
 }
 
 export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
@@ -64,6 +65,17 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
     const initialCameraPosition = useRef({ x: 0, y: 0, z: 100 });
 
     const [isInitialized, setIsInitialized] = useState(false);
+
+    // Animation state for smooth camera transitions
+    const cameraAnimationRef = useRef<{
+      active: boolean;
+      startPosition: THREE.Vector3;
+      endPosition: THREE.Vector3;
+      startTarget: THREE.Vector3;
+      endTarget: THREE.Vector3;
+      startTime: number;
+      duration: number;
+    } | null>(null);
 
     // Expose control methods via ref
     useImperativeHandle(ref, () => ({
@@ -99,6 +111,34 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
         if (simulationRef.current) {
           simulationRef.current.reheat();
         }
+      },
+      zoomToNode: (nodeId: string) => {
+        if (!sceneRef.current) return;
+
+        const mesh = nodeMeshesRef.current.get(nodeId);
+        if (!mesh) return;
+
+        const camera = sceneRef.current.camera;
+        const controls = sceneRef.current.controls;
+        const nodePosition = mesh.position.clone();
+
+        // Calculate camera position: offset from node towards current camera
+        const direction = new THREE.Vector3()
+          .subVectors(camera.position, nodePosition)
+          .normalize();
+        const distance = 30; // How far from node to position camera
+        const endPosition = nodePosition.clone().add(direction.multiplyScalar(distance));
+
+        // Start animation
+        cameraAnimationRef.current = {
+          active: true,
+          startPosition: camera.position.clone(),
+          endPosition,
+          startTarget: controls.target.clone(),
+          endTarget: nodePosition,
+          startTime: performance.now(),
+          duration: 800, // ms
+        };
       },
     }));
 
@@ -225,6 +265,22 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
               }
             }
           }
+        }
+      }
+
+      // Handle camera animation for zoom-to-node
+      const anim = cameraAnimationRef.current;
+      if (anim?.active) {
+        const elapsed = performance.now() - anim.startTime;
+        const progress = Math.min(elapsed / anim.duration, 1);
+        // Ease out cubic for smooth deceleration
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        scene.camera.position.lerpVectors(anim.startPosition, anim.endPosition, eased);
+        scene.controls.target.lerpVectors(anim.startTarget, anim.endTarget, eased);
+
+        if (progress >= 1) {
+          cameraAnimationRef.current = null;
         }
       }
 

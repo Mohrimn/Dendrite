@@ -3,6 +3,9 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 export interface GraphSceneConfig {
   container: HTMLElement;
@@ -11,6 +14,12 @@ export interface GraphSceneConfig {
   enableDamping?: boolean;
   ambientLightIntensity?: number;
   pointLightIntensity?: number;
+  enableBloom?: boolean;
+  bloomStrength?: number;
+  bloomRadius?: number;
+  bloomThreshold?: number;
+  enableParticles?: boolean;
+  particleCount?: number;
 }
 
 export interface GraphScene {
@@ -20,6 +29,8 @@ export interface GraphScene {
   controls: OrbitControls;
   nodeGroup: THREE.Group;
   edgeGroup: THREE.Group;
+  particleGroup: THREE.Group | null;
+  composer: EffectComposer | null;
   dispose: () => void;
   resize: () => void;
   render: () => void;
@@ -31,6 +42,12 @@ const DEFAULT_CONFIG: Required<Omit<GraphSceneConfig, 'container'>> = {
   enableDamping: true,
   ambientLightIntensity: 0.6,
   pointLightIntensity: 0.8,
+  enableBloom: true,
+  bloomStrength: 0.8,
+  bloomRadius: 0.4,
+  bloomThreshold: 0.2,
+  enableParticles: true,
+  particleCount: 200,
 };
 
 export function createGraphScene(config: GraphSceneConfig): GraphScene {
@@ -41,6 +58,12 @@ export function createGraphScene(config: GraphSceneConfig): GraphScene {
     enableDamping,
     ambientLightIntensity,
     pointLightIntensity,
+    enableBloom,
+    bloomStrength,
+    bloomRadius,
+    bloomThreshold,
+    enableParticles,
+    particleCount,
   } = { ...DEFAULT_CONFIG, ...config };
 
   // Scene
@@ -84,6 +107,63 @@ export function createGraphScene(config: GraphSceneConfig): GraphScene {
   scene.add(edgeGroup); // Add edges first so they render behind nodes
   scene.add(nodeGroup);
 
+  // Post-processing with bloom
+  let composer: EffectComposer | null = null;
+  if (enableBloom) {
+    composer = new EffectComposer(renderer);
+    const renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
+
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(container.clientWidth, container.clientHeight),
+      bloomStrength,
+      bloomRadius,
+      bloomThreshold
+    );
+    composer.addPass(bloomPass);
+  }
+
+  // Ambient particles for atmosphere
+  let particleGroup: THREE.Group | null = null;
+  if (enableParticles) {
+    particleGroup = new THREE.Group();
+    const particleGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      const i3 = i * 3;
+      // Spread particles in a large sphere around the scene
+      const radius = 80 + Math.random() * 120;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i3 + 2] = radius * Math.cos(phi);
+
+      // Subtle blue/purple tint
+      colors[i3] = 0.4 + Math.random() * 0.2;
+      colors[i3 + 1] = 0.4 + Math.random() * 0.3;
+      colors[i3 + 2] = 0.6 + Math.random() * 0.4;
+    }
+
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 0.5,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending,
+    });
+
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    particleGroup.add(particles);
+    scene.add(particleGroup);
+  }
+
   // Resize handler
   const resize = () => {
     const width = container.clientWidth;
@@ -93,22 +173,42 @@ export function createGraphScene(config: GraphSceneConfig): GraphScene {
     camera.updateProjectionMatrix();
 
     renderer.setSize(width, height);
+    if (composer) {
+      composer.setSize(width, height);
+    }
   };
 
   // Render function
   const render = () => {
     controls.update();
-    renderer.render(scene, camera);
+
+    // Slowly rotate particles for ambient effect
+    if (particleGroup) {
+      particleGroup.rotation.y += 0.0002;
+      particleGroup.rotation.x += 0.0001;
+    }
+
+    if (composer) {
+      composer.render();
+    } else {
+      renderer.render(scene, camera);
+    }
   };
 
   // Cleanup function
   const dispose = () => {
     controls.dispose();
     renderer.dispose();
+    if (composer) {
+      composer.dispose();
+    }
 
     // Remove all objects from groups
     nodeGroup.clear();
     edgeGroup.clear();
+    if (particleGroup) {
+      particleGroup.clear();
+    }
 
     // Remove renderer from DOM
     if (renderer.domElement.parentNode) {
@@ -125,6 +225,12 @@ export function createGraphScene(config: GraphSceneConfig): GraphScene {
           object.material.dispose();
         }
       }
+      if (object instanceof THREE.Points) {
+        object.geometry.dispose();
+        if (object.material instanceof THREE.Material) {
+          object.material.dispose();
+        }
+      }
     });
   };
 
@@ -135,6 +241,8 @@ export function createGraphScene(config: GraphSceneConfig): GraphScene {
     controls,
     nodeGroup,
     edgeGroup,
+    particleGroup,
+    composer,
     dispose,
     resize,
     render,
