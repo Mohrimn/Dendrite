@@ -4,7 +4,9 @@
 import { type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Sidebar } from './Sidebar';
+import { MobileHeader } from './MobileHeader';
 import { useStore } from '@/store';
+import { useIsMobile } from '@/hooks';
 
 interface AppShellProps {
   children: ReactNode;
@@ -12,6 +14,7 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const sidebarCollapsed = useStore((state) => state.sidebarCollapsed);
+  const isMobile = useIsMobile();
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -23,15 +26,16 @@ export function AppShell({ children }: AppShellProps) {
         Skip to main content
       </a>
 
+      {isMobile && <MobileHeader />}
       <Sidebar />
 
       <motion.main
         id="main-content"
         role="main"
         initial={false}
-        animate={{ marginLeft: sidebarCollapsed ? 72 : 240 }}
+        animate={{ marginLeft: isMobile ? 0 : sidebarCollapsed ? 72 : 240 }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
-        className="min-h-screen"
+        className={isMobile ? 'min-h-screen pt-14' : 'min-h-screen'}
         tabIndex={-1}
       >
         {children}

@@ -6,6 +6,7 @@ import { TagPill } from './TagPill';
 import { LinkPreview } from './LinkPreview';
 import { formatRelativeTime, truncate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks';
 
 interface ScrapCardProps {
   scrap: Scrap;
@@ -64,6 +65,8 @@ export const ScrapCard = memo(function ScrapCard({
   onPin,
   onTagClick,
 }: ScrapCardProps) {
+  const isMobile = useIsMobile();
+
   return (
     <motion.div
       layout
@@ -184,18 +187,22 @@ export const ScrapCard = memo(function ScrapCard({
             {formatRelativeTime(scrap.createdAt)}
           </time>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          {/* Actions - always visible on mobile for touch accessibility */}
+          <div className={cn(
+            'flex items-center gap-1 transition-opacity',
+            isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          )}>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onPin?.();
               }}
               className={cn(
-                'rounded p-1.5 transition-colors',
+                'rounded p-2 transition-colors',
+                'min-h-[44px] min-w-[44px] flex items-center justify-center',
                 scrap.isPinned
-                  ? 'text-amber-500 hover:bg-amber-50'
-                  : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                  ? 'text-amber-500 hover:bg-amber-50 active:bg-amber-100'
+                  : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 active:bg-slate-200'
               )}
             >
               <svg

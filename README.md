@@ -58,20 +58,6 @@ src/
 - `Ctrl/Cmd + N` - Quick capture (create new scrap)
 - `Ctrl/Cmd + K` - Search (coming soon)
 
-## Implementation Status
-
-### Completed
-- [x] **Phase 1: Foundation** - Project setup, UI components, scrap CRUD, routing
-- [x] **Phase 2: Enrichment & Tags** - Auto-tagging, keyword extraction, filtering
-
-### Upcoming
-- [ ] **Phase 3: Search** - Full-text search with MiniSearch
-- [ ] **Phase 4: Clustering** - TF-IDF and k-means auto-grouping
-- [ ] **Phase 5: Graph Visualization** - Three.js knowledge graph
-- [ ] **Phase 6: PWA & Polish** - Service worker, offline support, final polish
-
-See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for detailed technical specifications.
-
 ## Data Storage
 
 All data is stored locally in your browser using IndexedDB. No data is sent to any server. You can export your data from Settings.

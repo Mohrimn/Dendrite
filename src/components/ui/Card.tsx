@@ -16,7 +16,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           interactive && [
             'cursor-pointer',
             'hover:border-slate-300 hover:shadow-md hover:-translate-y-0.5',
-            'active:translate-y-0 active:shadow-sm',
+            'active:translate-y-0 active:shadow-sm active:bg-slate-50',
+            'touch-manipulation',
           ],
           className
         )}

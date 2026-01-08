@@ -90,7 +90,7 @@ export function HomePage() {
     <>
       <Header title="Scraps" subtitle={subtitle} />
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-indigo-600" />

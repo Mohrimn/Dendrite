@@ -5,6 +5,7 @@ import { useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -16,11 +17,11 @@ export interface ModalProps {
 }
 
 const sizeClasses = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-  xl: 'max-w-xl',
-  full: 'max-w-4xl',
+  sm: 'sm:max-w-sm',
+  md: 'sm:max-w-md',
+  lg: 'sm:max-w-lg',
+  xl: 'sm:max-w-xl',
+  full: 'sm:max-w-4xl',
 };
 
 export function Modal({
@@ -33,6 +34,7 @@ export function Modal({
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const isMobile = useIsMobile();
 
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
@@ -61,10 +63,28 @@ export function Modal({
     };
   }, [isOpen, handleEscape]);
 
+  // Mobile: slide up from bottom, Desktop: scale from center
+  const mobileAnimation = {
+    initial: { opacity: 0, y: '100%' },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: '100%' },
+  };
+
+  const desktopAnimation = {
+    initial: { opacity: 0, scale: 0.95, y: 10 },
+    animate: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.95, y: 10 },
+  };
+
+  const animation = isMobile ? mobileAnimation : desktopAnimation;
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className={cn(
+          'fixed inset-0 z-50 flex',
+          isMobile ? 'items-end' : 'items-center justify-center p-4'
+        )}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -80,18 +100,27 @@ export function Modal({
             aria-labelledby={title ? 'modal-title' : undefined}
             aria-describedby={description ? 'modal-description' : undefined}
             tabIndex={-1}
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            {...animation}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
-              'relative w-full rounded-2xl bg-white shadow-2xl',
-              'max-h-[90vh] overflow-hidden focus:outline-none',
-              sizeClasses[size]
+              'relative w-full bg-white shadow-2xl focus:outline-none',
+              isMobile
+                ? 'max-h-[92vh] rounded-t-2xl'
+                : cn('max-h-[90vh] rounded-2xl', sizeClasses[size]),
+              'overflow-hidden'
             )}
           >
+            {/* Mobile swipe indicator */}
+            {isMobile && (
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="h-1 w-10 rounded-full bg-slate-300" />
+              </div>
+            )}
             {(title || description) && (
-              <div className="border-b border-slate-100 px-6 py-4">
+              <div className={cn(
+                'border-b border-slate-100 px-6',
+                isMobile ? 'py-3' : 'py-4'
+              )}>
                 {title && (
                   <h2 id="modal-title" className="text-lg font-semibold text-slate-900">{title}</h2>
                 )}

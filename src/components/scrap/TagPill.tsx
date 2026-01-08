@@ -38,9 +38,9 @@ export const TagPill = forwardRef<HTMLSpanElement, TagPillProps>(
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5',
+          'inline-flex items-center gap-1 rounded-full px-2.5 py-1',
           'text-xs font-medium transition-all duration-200',
-          onClick && 'cursor-pointer hover:scale-105',
+          onClick && 'cursor-pointer hover:scale-105 active:scale-95 touch-manipulation',
           isSystem && 'border border-dashed',
           className
         )}
