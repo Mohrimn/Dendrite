@@ -1,11 +1,32 @@
+import { useState } from 'react';
 import { Header } from '@/components/layout';
 import { Card, Button } from '@/components/ui';
 import { useStore } from '@/store';
 import { db } from '@/db';
+import { seedTestData } from '@/utils';
 
 export function SettingsPage() {
   const viewMode = useStore((state) => state.viewMode);
   const setViewMode = useStore((state) => state.setViewMode);
+  const createScrap = useStore((state) => state.createScrap);
+  const loadScraps = useStore((state) => state.loadScraps);
+  const [isSeeding, setIsSeeding] = useState(false);
+
+  const handleSeedData = async () => {
+    if (window.confirm('This will add 28 test scraps to your scrapbook. Continue?')) {
+      setIsSeeding(true);
+      try {
+        await seedTestData(createScrap);
+        await loadScraps();
+        alert('Test data added successfully!');
+      } catch (error) {
+        console.error('Failed to seed data:', error);
+        alert('Failed to add test data');
+      } finally {
+        setIsSeeding(false);
+      }
+    }
+  };
 
   const handleClearData = async () => {
     if (window.confirm('Are you sure you want to delete all your scraps? This cannot be undone.')) {
@@ -88,6 +109,27 @@ export function SettingsPage() {
                     Clear Data
                   </Button>
                 </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Developer Tools */}
+          <Card>
+            <h3 className="mb-4 font-medium text-slate-900">Developer Tools</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-slate-700">Seed Test Data</p>
+                  <p className="text-sm text-slate-500">Add 28 sample scraps for testing search and clustering</p>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleSeedData}
+                  disabled={isSeeding}
+                >
+                  {isSeeding ? 'Seeding...' : 'Add Test Data'}
+                </Button>
               </div>
             </div>
           </Card>
