@@ -48,8 +48,9 @@ export async function enrichScrap(input: CreateScrapInput): Promise<EnrichmentRe
   const textToAnalyze = [title, content].filter(Boolean).join(' ');
   keywords = extractKeywords(textToAnalyze, 10);
 
-  // Generate auto-tags from keywords
-  const suggestedTags = suggestTags(textToAnalyze, autoTags);
+  // Generate auto-tags from keywords (excluding user-selected tags to avoid duplicates)
+  const existingTags = [...autoTags, ...(input.tags || [])];
+  const suggestedTags = suggestTags(textToAnalyze, existingTags);
   autoTags.push(...suggestedTags);
 
   // Add type-specific tags

@@ -13,6 +13,7 @@ export function ClusterPage() {
   const navigate = useNavigate();
   const scraps = useScraps();
   const selectScrap = useStore((state) => state.selectScrap);
+  const openModal = useStore((state) => state.openModal);
 
   const [clusters, setClusters] = useState<Cluster[]>([]);
   const [quality, setQuality] = useState(0);
@@ -50,6 +51,7 @@ export function ClusterPage() {
 
   const handleScrapClick = (scrapId: string) => {
     selectScrap(scrapId);
+    openModal('detail');
     navigate('/');
   };
 
