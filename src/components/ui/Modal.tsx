@@ -1,4 +1,7 @@
-import { useEffect, useCallback, type ReactNode } from 'react';
+// ABOUTME: Accessible modal dialog component
+// ABOUTME: Handles focus trapping, escape key, and ARIA attributes
+
+import { useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -28,6 +31,9 @@ export function Modal({
   children,
   size = 'md',
 }: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -37,8 +43,17 @@ export function Modal({
 
   useEffect(() => {
     if (isOpen) {
+      // Store the currently focused element
+      previousActiveElement.current = document.activeElement as HTMLElement;
+
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
+
+      // Focus the modal
+      setTimeout(() => modalRef.current?.focus(), 0);
+    } else {
+      // Restore focus when modal closes
+      previousActiveElement.current?.focus();
     }
     return () => {
       document.removeEventListener('keydown', handleEscape);
@@ -59,29 +74,36 @@ export function Modal({
             onClick={onClose}
           />
           <motion.div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={title ? 'modal-title' : undefined}
+            aria-describedby={description ? 'modal-description' : undefined}
+            tabIndex={-1}
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
               'relative w-full rounded-2xl bg-white shadow-2xl',
-              'max-h-[90vh] overflow-hidden',
+              'max-h-[90vh] overflow-hidden focus:outline-none',
               sizeClasses[size]
             )}
           >
             {(title || description) && (
               <div className="border-b border-slate-100 px-6 py-4">
                 {title && (
-                  <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+                  <h2 id="modal-title" className="text-lg font-semibold text-slate-900">{title}</h2>
                 )}
                 {description && (
-                  <p className="mt-1 text-sm text-slate-500">{description}</p>
+                  <p id="modal-description" className="mt-1 text-sm text-slate-500">{description}</p>
                 )}
               </div>
             )}
             <div className="overflow-y-auto p-6">{children}</div>
             <button
               onClick={onClose}
+              aria-label="Close dialog"
               className={cn(
                 'absolute right-4 top-4 rounded-lg p-1.5',
                 'text-slate-400 hover:bg-slate-100 hover:text-slate-600',

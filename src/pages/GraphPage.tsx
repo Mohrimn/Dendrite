@@ -2,6 +2,7 @@
 // ABOUTME: Displays 3D force-directed graph of all scraps and connections
 
 import { useState, useCallback, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout';
 import {
   GraphCanvas,
@@ -11,6 +12,7 @@ import {
 } from '@/components/graph';
 import { useStore } from '@/store';
 import { ScrapDetail } from '@/components/scrap';
+import { EmptyState, GraphIllustration } from '@/components/empty-states';
 import type { ScrapType } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +25,7 @@ const TYPE_OPTIONS: { type: ScrapType; label: string; color: string }[] = [
 ];
 
 export function GraphPage() {
+  const navigate = useNavigate();
   const scraps = useStore((state) => state.scraps);
   const [selectedScrapId, setSelectedScrapId] = useState<string | null>(null);
   const [hoveredScrapId, setHoveredScrapId] = useState<string | null>(null);
@@ -100,36 +103,15 @@ export function GraphPage() {
       <div className="relative h-[calc(100vh-64px)]">
         {scraps.length === 0 ? (
           <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <div className="mb-4 flex h-24 w-24 mx-auto items-center justify-center rounded-full bg-slate-100">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="40"
-                  height="40"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  className="text-slate-400"
-                >
-                  <circle cx="12" cy="12" r="2" />
-                  <circle cx="4" cy="6" r="2" />
-                  <circle cx="20" cy="6" r="2" />
-                  <circle cx="4" cy="18" r="2" />
-                  <circle cx="20" cy="18" r="2" />
-                  <line x1="6" y1="6" x2="10" y2="10.5" />
-                  <line x1="18" y1="6" x2="14" y2="10.5" />
-                  <line x1="6" y1="18" x2="10" y2="13.5" />
-                  <line x1="18" y1="18" x2="14" y2="13.5" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-slate-900">
-                No scraps yet
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Create some scraps to see them visualized here
-              </p>
-            </div>
+            <EmptyState
+              icon={<GraphIllustration />}
+              title="No scraps to visualize"
+              description="Your knowledge graph will appear here once you create some scraps. Start capturing your ideas!"
+              action={{
+                label: 'Create scraps',
+                onClick: () => navigate('/'),
+              }}
+            />
           </div>
         ) : (
           <>

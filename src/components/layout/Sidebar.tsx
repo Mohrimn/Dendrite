@@ -1,3 +1,6 @@
+// ABOUTME: Navigation sidebar with collapsible design
+// ABOUTME: Provides main app navigation with animated active states
+
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -69,6 +72,8 @@ export function Sidebar() {
 
   return (
     <motion.aside
+      role="navigation"
+      aria-label="Main navigation"
       initial={false}
       animate={{ width: sidebarCollapsed ? 72 : 240 }}
       transition={{ duration: 0.2, ease: 'easeInOut' }}
@@ -115,24 +120,36 @@ export function Sidebar() {
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5',
+                  'relative flex items-center gap-3 rounded-lg px-3 py-2.5',
                   'transition-colors duration-200',
                   isActive
-                    ? 'bg-slate-100 text-slate-900'
+                    ? 'text-slate-900'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 )
               }
             >
-              {item.icon}
-              {!sidebarCollapsed && (
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-sm font-medium"
-                >
-                  {item.label}
-                </motion.span>
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebar-active"
+                      className="absolute inset-0 rounded-lg bg-slate-100"
+                      initial={false}
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <span className="relative z-10">{item.icon}</span>
+                  {!sidebarCollapsed && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="relative z-10 text-sm font-medium"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </>
               )}
             </NavLink>
           ))}
@@ -142,6 +159,8 @@ export function Sidebar() {
         <div className="border-t border-slate-100 p-3">
           <button
             onClick={toggleSidebar}
+            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-expanded={!sidebarCollapsed}
             className={cn(
               'flex w-full items-center gap-3 rounded-lg px-3 py-2.5',
               'text-slate-600 transition-colors duration-200',

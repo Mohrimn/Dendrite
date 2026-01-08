@@ -16,16 +16,40 @@
   }
 
   html {
-    @apply antialiased;
+    @apply antialiased scroll-smooth;
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 font-sans;
+    @apply bg-slate-50 text-slate-900 font-sans leading-relaxed;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   * {
     @apply border-slate-200;
+  }
+
+  /* Consistent heading styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold leading-tight tracking-tight text-slate-900;
+  }
+
+  h1 { @apply text-3xl; }
+  h2 { @apply text-2xl; }
+  h3 { @apply text-xl; }
+  h4 { @apply text-lg; }
+
+  /* Better focus styles for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-indigo-500 ring-offset-2;
+  }
+
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 

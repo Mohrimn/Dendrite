@@ -6,6 +6,7 @@ import { ClusterCard } from '@/components/cluster';
 import { Button } from '@/components/ui';
 import { useScraps, useStore } from '@/store';
 import { clusterEngine, type ClusterEngineResult } from '@/services/clustering';
+import { EmptyState, ClusterIllustration } from '@/components/empty-states';
 import type { Cluster } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -60,34 +61,15 @@ export function ClusterPage() {
       <>
         <Header title="Clusters" subtitle="Themed groups of related scraps" />
         <div className="flex h-[calc(100vh-64px)] items-center justify-center">
-          <div className="text-center max-w-md">
-            <div className="mb-4 flex h-24 w-24 mx-auto items-center justify-center rounded-full bg-slate-100">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                className="text-slate-400"
-              >
-                <circle cx="12" cy="12" r="3" />
-                <circle cx="19" cy="5" r="2" />
-                <circle cx="5" cy="5" r="2" />
-                <circle cx="19" cy="19" r="2" />
-                <circle cx="5" cy="19" r="2" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-slate-900">Not enough scraps</h3>
-            <p className="mt-2 text-sm text-slate-500">
-              Add at least 2 scraps to see automatic thematic clusters.
-              The more scraps you add, the better the clustering will be.
-            </p>
-            <Button onClick={() => navigate('/')} className="mt-6">
-              Add Scraps
-            </Button>
-          </div>
+          <EmptyState
+            icon={<ClusterIllustration />}
+            title="Not enough scraps"
+            description="Add at least 2 scraps to see automatic thematic clusters. The more scraps you add, the better the clustering will be."
+            action={{
+              label: 'Add scraps',
+              onClick: () => navigate('/'),
+            }}
+          />
         </div>
       </>
     );
