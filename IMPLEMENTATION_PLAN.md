@@ -200,33 +200,29 @@ const searchIndex = new MiniSearch({
 
 **Deliverable**: Automatic thematic clustering
 
-### Phase 5: Graph Visualization 🔲 TODO
-1. Set up Three.js scene with camera, lights, controls
-2. Add post-processing (UnrealBloomPass for glow)
-3. Integrate d3-force-3d for physics simulation
-4. Create node geometries (spheres with emissive materials)
-5. Create edge geometries (curved lines)
-6. Add ambient particles for atmosphere
-7. Implement raycasting for hover/click interactions
-8. Build GraphControls (zoom, reset, reheat simulation)
-9. Build GraphLegend (node type colors)
-10. Build GraphNodeTooltip
-11. Add zoom-to-node on click
-12. Add filter by cluster/type
+### Phase 5: Graph Visualization ✅ COMPLETED
+1. ✅ Set up Three.js scene with camera, lights, controls
+2. 🔲 Add post-processing (UnrealBloomPass for glow) - deferred
+3. ✅ Integrate d3-force-3d for physics simulation
+4. ✅ Create node geometries (spheres with emissive materials)
+5. ✅ Create edge geometries (lines)
+6. 🔲 Add ambient particles for atmosphere - deferred
+7. ✅ Implement raycasting for hover/click interactions
+8. ✅ Build GraphControls (zoom, reset, reheat simulation)
+9. ✅ Build GraphLegend (node type colors)
+10. ✅ Build GraphNodeTooltip (hover tooltip + detail panel)
+11. 🔲 Add zoom-to-node on click - deferred
+12. 🔲 Add filter by cluster/type - deferred
 
 **Implementation Notes**:
-```typescript
-// Node colors by type
-const NODE_COLORS = {
-  thought: '#8b5cf6',
-  link: '#06b6d4',
-  image: '#f59e0b',
-  snippet: '#10b981',
-  note: '#ec4899',
-};
-```
+- Core graph visualization working with Three.js + d3-force-3d
+- Nodes colored by type with hover/selected states
+- Edge lines connect related scraps
+- Force simulation positions nodes in 3D space
+- Click to select nodes and view detail panel
+- Post-processing and particles can be added later for polish
 
-**Deliverable**: Stunning 3D knowledge graph
+**Deliverable**: 3D knowledge graph visualization
 
 ### Phase 6: PWA & Polish 🔲 TODO
 1. Configure vite-plugin-pwa with workbox
@@ -381,13 +377,13 @@ export function createForceSimulation(
 - [x] src/services/clustering/kmeans.ts
 - [x] src/services/clustering/clusterEngine.ts
 - [x] src/components/cluster/ClusterCard.tsx
-- [ ] src/lib/three/setup.ts
-- [ ] src/lib/three/geometries.ts
-- [ ] src/lib/three/materials.ts
-- [ ] src/services/graph/graphBuilder.ts
-- [ ] src/services/graph/forceSimulation.ts
-- [ ] src/components/graph/GraphCanvas.tsx
-- [ ] src/components/graph/GraphControls.tsx
-- [ ] src/components/graph/GraphLegend.tsx
+- [x] src/lib/three/setup.ts
+- [x] src/lib/three/geometries.ts
+- [x] src/lib/three/materials.ts
+- [x] src/services/graph/graphBuilder.ts
+- [x] src/services/graph/forceSimulation.ts
+- [x] src/components/graph/GraphCanvas.tsx
+- [x] src/components/graph/GraphControls.tsx
+- [x] src/components/graph/GraphLegend.tsx
 - [ ] src/hooks/usePWA.ts
 - [ ] src/components/PWAPrompt.tsx
