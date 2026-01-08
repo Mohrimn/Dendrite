@@ -21,6 +21,9 @@ import {
   type NodeMesh,
 } from '@/lib/three';
 
+// Stable empty array to prevent unnecessary re-renders
+const EMPTY_CONNECTIONS: Connection[] = [];
+
 interface GraphCanvasProps {
   scraps: Scrap[];
   connections?: Connection[];
@@ -41,7 +44,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
   function GraphCanvas(
     {
       scraps,
-      connections = [],
+      connections = EMPTY_CONNECTIONS,
       onNodeClick,
       onNodeHover,
       selectedNodeId,
