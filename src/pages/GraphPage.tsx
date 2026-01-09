@@ -11,9 +11,10 @@ import {
   type GraphCanvasHandle,
 } from '@/components/graph';
 import { useStore } from '@/store';
-import { ScrapDetail } from '@/components/scrap';
+import { ScrapDetail, ScrapForm } from '@/components/scrap';
+import { Modal } from '@/components/ui';
 import { EmptyState, GraphIllustration } from '@/components/empty-states';
-import type { ScrapType } from '@/types';
+import type { ScrapType, CreateScrapInput } from '@/types';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks';
 
@@ -28,11 +29,14 @@ const TYPE_OPTIONS: { type: ScrapType; label: string; color: string }[] = [
 export function GraphPage() {
   const navigate = useNavigate();
   const scraps = useStore((state) => state.scraps);
+  const updateScrap = useStore((state) => state.updateScrap);
+  const deleteScrap = useStore((state) => state.deleteScrap);
   const [selectedScrapId, setSelectedScrapId] = useState<string | null>(null);
   const [hoveredScrapId, setHoveredScrapId] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<ScrapType | null>(null);
   const [clusterFilter, setClusterFilter] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const graphRef = useRef<GraphCanvasHandle>(null);
   const isMobile = useIsMobile();
 
@@ -83,6 +87,27 @@ export function GraphPage() {
   const handleCloseDetail = useCallback(() => {
     setSelectedScrapId(null);
   }, []);
+
+  const handleEdit = useCallback(() => {
+    setIsEditModalOpen(true);
+  }, []);
+
+  const handleUpdateScrap = useCallback(
+    async (data: CreateScrapInput) => {
+      if (selectedScrap) {
+        await updateScrap(selectedScrap.id, data);
+        setIsEditModalOpen(false);
+      }
+    },
+    [selectedScrap, updateScrap]
+  );
+
+  const handleDeleteScrap = useCallback(async () => {
+    if (selectedScrap) {
+      await deleteScrap(selectedScrap.id);
+      setSelectedScrapId(null);
+    }
+  }, [selectedScrap, deleteScrap]);
 
   const handleZoomIn = useCallback(() => {
     graphRef.current?.zoomIn();
@@ -288,12 +313,33 @@ export function GraphPage() {
                     <div className="h-1 w-10 rounded-full bg-slate-300" />
                   </div>
                 )}
-                <ScrapDetail scrap={selectedScrap} onClose={handleCloseDetail} />
+                <ScrapDetail
+                  scrap={selectedScrap}
+                  onEdit={handleEdit}
+                  onDelete={handleDeleteScrap}
+                  onClose={handleCloseDetail}
+                />
               </div>
             )}
           </>
         )}
       </div>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={isEditModalOpen && !!selectedScrap}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Scrap"
+        size="lg"
+      >
+        {selectedScrap && (
+          <ScrapForm
+            onSubmit={handleUpdateScrap}
+            onCancel={() => setIsEditModalOpen(false)}
+            initialData={selectedScrap}
+          />
+        )}
+      </Modal>
     </>
   );
 }

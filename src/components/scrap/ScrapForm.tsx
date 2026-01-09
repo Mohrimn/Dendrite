@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { ScrapType, CreateScrapInput, ImageData } from '@/types';
+import type { Scrap, ScrapType, CreateScrapInput, ImageData } from '@/types';
 import { Button, Input, Textarea } from '@/components/ui';
 import { TagInput } from './TagInput';
 import { ImageUpload } from './ImageUpload';
@@ -10,6 +10,7 @@ interface ScrapFormProps {
   onSubmit: (data: CreateScrapInput) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  initialData?: Scrap;
 }
 
 const scrapTypes: { type: ScrapType; label: string; icon: React.ReactNode }[] = [
@@ -75,23 +76,24 @@ const typeColors: Record<ScrapType, string> = {
   note: '#ec4899',
 };
 
-export function ScrapForm({ onSubmit, onCancel, isLoading }: ScrapFormProps) {
-  const [type, setType] = useState<ScrapType>('thought');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [url, setUrl] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [imageData, setImageData] = useState<ImageData | undefined>();
+export function ScrapForm({ onSubmit, onCancel, isLoading, initialData }: ScrapFormProps) {
+  const [type, setType] = useState<ScrapType>(initialData?.type ?? 'thought');
+  const [title, setTitle] = useState(initialData?.title ?? '');
+  const [content, setContent] = useState(initialData?.content ?? '');
+  const [url, setUrl] = useState(initialData?.url ?? '');
+  const [tags, setTags] = useState<string[]>(initialData?.tags ?? []);
+  const [imageData, setImageData] = useState<ImageData | undefined>(initialData?.imageData);
   const [tagSuggestions, setTagSuggestions] = useState<string[]>([]);
+  const isEditing = !!initialData;
 
-  // Auto-detect URL in content
+  // Auto-detect URL in content (only for new scraps)
   useEffect(() => {
-    if (type === 'thought' && content.trim() && isValidUrl(content.trim())) {
+    if (!isEditing && type === 'thought' && content.trim() && isValidUrl(content.trim())) {
       setType('link');
       setUrl(content.trim());
       setContent('');
     }
-  }, [content, type]);
+  }, [content, type, isEditing]);
 
   // Generate tag suggestions
   useEffect(() => {
@@ -260,7 +262,7 @@ export function ScrapForm({ onSubmit, onCancel, isLoading }: ScrapFormProps) {
           Cancel
         </Button>
         <Button type="submit" isLoading={isLoading} disabled={!isValid()}>
-          Create Scrap
+          {isEditing ? 'Save' : 'Create Scrap'}
         </Button>
       </div>
     </form>

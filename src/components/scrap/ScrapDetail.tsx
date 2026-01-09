@@ -20,7 +20,7 @@ const typeColors: Record<string, string> = {
 
 export function ScrapDetail({ scrap, onEdit, onDelete, onClose }: ScrapDetailProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">

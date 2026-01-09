@@ -12,6 +12,7 @@ export function HomePage() {
   const isLoading = useIsLoading();
   const loadScraps = useStore((state) => state.loadScraps);
   const createScrap = useStore((state) => state.createScrap);
+  const updateScrap = useStore((state) => state.updateScrap);
   const deleteScrap = useStore((state) => state.deleteScrap);
   const activeModal = useStore((state) => state.activeModal);
   const openModal = useStore((state) => state.openModal);
@@ -45,6 +46,16 @@ export function HomePage() {
       closeModal();
     },
     [createScrap, closeModal]
+  );
+
+  const handleUpdateScrap = useCallback(
+    async (data: CreateScrapInput) => {
+      if (selectedScrap) {
+        await updateScrap(selectedScrap.id, data);
+        closeModal();
+      }
+    },
+    [selectedScrap, updateScrap, closeModal]
   );
 
   const handleDeleteScrap = useCallback(async () => {
@@ -184,6 +195,22 @@ export function HomePage() {
             onEdit={() => openModal('edit')}
             onDelete={handleDeleteScrap}
             onClose={handleCloseDetail}
+          />
+        )}
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={activeModal === 'edit' && !!selectedScrap}
+        onClose={closeModal}
+        title="Edit Scrap"
+        size="lg"
+      >
+        {selectedScrap && (
+          <ScrapForm
+            onSubmit={handleUpdateScrap}
+            onCancel={closeModal}
+            initialData={selectedScrap}
           />
         )}
       </Modal>
