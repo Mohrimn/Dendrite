@@ -3,11 +3,9 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 
-// Base path for GitHub Pages deployment
-const base = process.env.GITHUB_ACTIONS ? '/dendrite/' : '/';
-
 export default defineConfig({
-  base,
+  // Base path for GitHub Pages (https://mohrimn.github.io/dendrite/)
+  base: '/dendrite/',
   plugins: [
     react(),
     VitePWA({
@@ -21,8 +19,8 @@ export default defineConfig({
         background_color: '#0f172a',
         display: 'standalone',
         orientation: 'portrait-primary',
-        scope: base,
-        start_url: base,
+        scope: '/dendrite/',
+        start_url: '/dendrite/',
         icons: [
           {
             src: 'icons/icon-192.png',
