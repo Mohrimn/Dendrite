@@ -2,7 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
+// Base path for GitHub Pages deployment
+var base = process.env.GITHUB_ACTIONS ? '/dendrite/' : '/';
 export default defineConfig({
+    base: base,
     plugins: [
         react(),
         VitePWA({
@@ -16,21 +19,21 @@ export default defineConfig({
                 background_color: '#0f172a',
                 display: 'standalone',
                 orientation: 'portrait-primary',
-                scope: '/',
-                start_url: '/',
+                scope: base,
+                start_url: base,
                 icons: [
                     {
-                        src: '/icons/icon-192.png',
+                        src: 'icons/icon-192.png',
                         sizes: '192x192',
                         type: 'image/png',
                     },
                     {
-                        src: '/icons/icon-512.png',
+                        src: 'icons/icon-512.png',
                         sizes: '512x512',
                         type: 'image/png',
                     },
                     {
-                        src: '/icons/maskable-icon.png',
+                        src: 'icons/maskable-icon.png',
                         sizes: '512x512',
                         type: 'image/png',
                         purpose: 'maskable',
