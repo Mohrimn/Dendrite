@@ -141,10 +141,23 @@ export function SettingsPage() {
               <p className="mb-2">
                 <strong>Dendrite</strong> v1.0.0
               </p>
-              <p>
+              <p className="mb-4">
                 A beautiful, offline-first personal knowledge capture tool.
                 All your data is stored locally in your browser.
               </p>
+              <div className="border-t border-slate-100 pt-4">
+                <p className="text-slate-500">
+                  Built by{' '}
+                  <a
+                    href="https://github.com/Mohrimn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-indigo-600 hover:text-indigo-700 hover:underline"
+                  >
+                    @Mohrimn
+                  </a>
+                </p>
+              </div>
             </div>
           </Card>
         </div>

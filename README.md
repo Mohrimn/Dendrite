@@ -89,6 +89,10 @@ src/
 
 All data stays on your device. Nothing is sent to any server. Export your data anytime from Settings.
 
+## Author
+
+Built by [@Mohrimn](https://github.com/Mohrimn)
+
 ## License
 
 MIT

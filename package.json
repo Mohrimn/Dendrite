@@ -2,6 +2,14 @@
   "name": "dendrite",
   "private": true,
   "version": "1.0.0",
+  "description": "A beautiful, offline-first personal knowledge capture and visualization tool",
+  "author": "Mohrimn (https://github.com/Mohrimn)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mohrimn/dendrite"
+  },
+  "homepage": "https://github.com/Mohrimn/dendrite",
   "type": "module",
   "scripts": {
     "dev": "vite",
