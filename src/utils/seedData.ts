@@ -1,5 +1,5 @@
 /**
- * Test seed data for the Knowledge Scrapbook
+ * Test seed data for Dendrite
  * Run this to populate the app with sample scraps for testing
  */
 

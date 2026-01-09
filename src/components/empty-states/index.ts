@@ -1,4 +1,4 @@
-export { EmptyScrapbook } from './EmptyScrapbook';
+export { EmptyCollection } from './EmptyCollection';
 export {
   EmptyState,
   ScrapbookIllustration,

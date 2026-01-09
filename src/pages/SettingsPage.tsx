@@ -13,7 +13,7 @@ export function SettingsPage() {
   const [isSeeding, setIsSeeding] = useState(false);
 
   const handleSeedData = async () => {
-    if (window.confirm('This will add 28 test scraps to your scrapbook. Continue?')) {
+    if (window.confirm('This will add 28 test scraps to Dendrite. Continue?')) {
       setIsSeeding(true);
       try {
         await seedTestData(createScrap);
@@ -47,7 +47,7 @@ export function SettingsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `scrapbook-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `dendrite-export-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -139,7 +139,7 @@ export function SettingsPage() {
             <h3 className="mb-4 font-medium text-slate-900">About</h3>
             <div className="text-sm text-slate-600">
               <p className="mb-2">
-                <strong>Knowledge Scrapbook</strong> v1.0.0
+                <strong>Dendrite</strong> v1.0.0
               </p>
               <p>
                 A beautiful, offline-first personal knowledge capture tool.

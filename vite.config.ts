@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'Knowledge Scrapbook',
-        short_name: 'Scrapbook',
+        name: 'Dendrite',
+        short_name: 'Dendrite',
         description: 'Your personal knowledge capture and visualization tool',
         theme_color: '#0f172a',
         background_color: '#0f172a',

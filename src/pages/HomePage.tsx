@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState, useMemo } from 'react';
 import { Header } from '@/components/layout';
 import { ScrapGrid, ScrapForm, ScrapDetail, FilterBar } from '@/components/scrap';
-import { EmptyScrapbook } from '@/components/empty-states';
+import { EmptyCollection } from '@/components/empty-states';
 import { Modal } from '@/components/ui';
 import { useStore, useScraps, useSelectedScrap, useIsLoading } from '@/store';
 import type { CreateScrapInput, ScrapType } from '@/types';
@@ -107,7 +107,7 @@ export function HomePage() {
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-indigo-600" />
           </div>
         ) : scraps.length === 0 ? (
-          <EmptyScrapbook />
+          <EmptyCollection />
         ) : (
           <div className="space-y-6">
             {/* Filter bar */}

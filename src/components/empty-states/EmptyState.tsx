@@ -85,13 +85,13 @@ export function ScrapbookIllustration() {
       height="64"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="url(#gradient-scrapbook)"
+      stroke="url(#gradient-collection)"
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
       <defs>
-        <linearGradient id="gradient-scrapbook" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="gradient-collection" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#6366f1" />
           <stop offset="100%" stopColor="#a855f7" />
         </linearGradient>

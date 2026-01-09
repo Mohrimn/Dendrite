@@ -44,7 +44,7 @@ export function PWAPrompt() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-slate-900">
-                  Install Knowledge Scrapbook
+                  Install Dendrite
                 </h3>
                 <p className="text-sm text-slate-500 mt-0.5">
                   Add to your home screen for offline access

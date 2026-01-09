@@ -128,7 +128,7 @@ export function Sidebar() {
                         <path d="m9 10 2 2 4-4" />
                       </svg>
                     </div>
-                    <span className="font-semibold text-slate-900">Scrapbook</span>
+                    <span className="font-semibold text-slate-900">Dendrite</span>
                   </div>
                   <button
                     onClick={() => setSidebarOpen(false)}
@@ -218,7 +218,7 @@ export function Sidebar() {
                 exit={{ opacity: 0 }}
                 className="font-semibold text-slate-900"
               >
-                Scrapbook
+                Dendrite
               </motion.span>
             )}
           </div>

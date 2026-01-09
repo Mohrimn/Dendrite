@@ -1,4 +1,4 @@
-# Knowledge Scrapbook
+# Dendrite
 
 A beautiful, offline-first personal knowledge capture and visualization tool. Capture thoughts, links, code snippets, and notes — then explore connections through an interactive 3D graph.
 

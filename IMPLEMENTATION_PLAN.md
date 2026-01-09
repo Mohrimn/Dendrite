@@ -1,4 +1,4 @@
-# Personal Knowledge Scrapbook - Implementation Plan
+# Dendrite - Implementation Plan
 
 ## Tech Stack (Confirmed)
 - **Framework**: React 18 + Vite + TypeScript

@@ -1,4 +1,4 @@
-// ABOUTME: Graph visualization page for the knowledge scrapbook
+// ABOUTME: Graph visualization page for Dendrite
 // ABOUTME: Displays 3D force-directed graph of all scraps and connections
 
 import { useState, useCallback, useRef, useMemo } from 'react';
