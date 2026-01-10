@@ -1,5 +1,5 @@
 import { db } from '../schema';
-import type { Scrap, ScrapType, CreateScrapInput, UpdateScrapInput } from '@/types';
+import type { Scrap, ScrapType, CreateScrapInput, UpdateScrapInput, ReadStatus } from '@/types';
 import { v4 as uuid } from 'uuid';
 
 function buildSearchableText(scrap: Partial<Scrap>): string {
@@ -35,6 +35,7 @@ export const scrapRepository = {
       isPinned: false,
       color: input.color,
       searchableText: '',
+      readStatus: input.type === 'link' ? 'unread' : undefined,
     };
     scrap.searchableText = buildSearchableText(scrap);
 
@@ -96,6 +97,28 @@ export const scrapRepository = {
     const scrap = await db.scraps.get(id);
     if (scrap) {
       await db.scraps.update(id, { isPinned: !scrap.isPinned });
+    }
+  },
+
+  async toggleReadStatus(id: string): Promise<void> {
+    const scrap = await db.scraps.get(id);
+    if (scrap && scrap.type === 'link') {
+      const newStatus: ReadStatus = scrap.readStatus === 'read' ? 'unread' : 'read';
+      await db.scraps.update(id, { readStatus: newStatus });
+    }
+  },
+
+  async getByReadStatus(status: ReadStatus): Promise<Scrap[]> {
+    return db.scraps.where('readStatus').equals(status).toArray();
+  },
+
+  async recordView(id: string): Promise<void> {
+    const scrap = await db.scraps.get(id);
+    if (scrap) {
+      await db.scraps.update(id, {
+        lastViewedAt: new Date(),
+        viewCount: (scrap.viewCount || 0) + 1,
+      });
     }
   },
 };

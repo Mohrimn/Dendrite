@@ -103,6 +103,11 @@ export const ScrapCard = memo(function ScrapCard({
           </div>
         )}
 
+        {/* Unread indicator for links */}
+        {scrap.type === 'link' && scrap.readStatus === 'unread' && (
+          <div className="absolute left-2 top-2 h-2.5 w-2.5 rounded-full bg-blue-500" />
+        )}
+
         {/* Type indicator */}
         <div className="mb-3 flex items-center gap-2">
           <span

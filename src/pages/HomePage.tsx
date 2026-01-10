@@ -1,10 +1,12 @@
 import { useEffect, useCallback, useState, useMemo } from 'react';
 import { Header } from '@/components/layout';
 import { ScrapGrid, ScrapForm, ScrapDetail, FilterBar } from '@/components/scrap';
+import { RediscoverWidget, ActivityHeatMap } from '@/components/widgets';
+import { SaveFilterDialog } from '@/components/smartView';
 import { EmptyCollection } from '@/components/empty-states';
 import { Modal } from '@/components/ui';
-import { useStore, useScraps, useSelectedScrap, useIsLoading } from '@/store';
-import type { CreateScrapInput, ScrapType } from '@/types';
+import { useStore, useScraps, useSelectedScrap, useIsLoading, useActiveSmartView } from '@/store';
+import type { CreateScrapInput, ScrapType, SmartViewFilters } from '@/types';
 
 export function HomePage() {
   const scraps = useScraps();
@@ -14,18 +16,46 @@ export function HomePage() {
   const createScrap = useStore((state) => state.createScrap);
   const updateScrap = useStore((state) => state.updateScrap);
   const deleteScrap = useStore((state) => state.deleteScrap);
+  const toggleReadStatus = useStore((state) => state.toggleReadStatus);
+  const recordView = useStore((state) => state.recordView);
   const activeModal = useStore((state) => state.activeModal);
   const openModal = useStore((state) => state.openModal);
   const closeModal = useStore((state) => state.closeModal);
   const selectScrap = useStore((state) => state.selectScrap);
+  const loadSmartViews = useStore((state) => state.loadSmartViews);
+  const createSmartView = useStore((state) => state.createSmartView);
+  const setActiveSmartView = useStore((state) => state.setActiveSmartView);
+  const activeSmartView = useActiveSmartView();
 
   // Filter state
   const [selectedType, setSelectedType] = useState<ScrapType | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [isSaveFilterDialogOpen, setIsSaveFilterDialogOpen] = useState(false);
+
+  // Apply smart view filters when selected
+  useEffect(() => {
+    if (activeSmartView) {
+      const { filters } = activeSmartView;
+      setSelectedType(filters.types?.[0] ?? null);
+      setSelectedTag(filters.tags?.[0] ?? null);
+    }
+  }, [activeSmartView]);
+
+  // Clear active smart view when user manually changes filters
+  const handleTypeChange = useCallback((type: ScrapType | null) => {
+    setSelectedType(type);
+    setActiveSmartView(null);
+  }, [setActiveSmartView]);
+
+  const handleTagChange = useCallback((tag: string | null) => {
+    setSelectedTag(tag);
+    setActiveSmartView(null);
+  }, [setActiveSmartView]);
 
   useEffect(() => {
     loadScraps();
-  }, [loadScraps]);
+    loadSmartViews();
+  }, [loadScraps, loadSmartViews]);
 
   // Keyboard shortcut for quick capture
   useEffect(() => {
@@ -70,9 +100,31 @@ export function HomePage() {
     closeModal();
   }, [selectScrap, closeModal]);
 
+  const handleToggleReadStatus = useCallback(async () => {
+    if (selectedScrap) {
+      await toggleReadStatus(selectedScrap.id);
+    }
+  }, [selectedScrap, toggleReadStatus]);
+
   const handleTagClick = useCallback((tag: string) => {
     setSelectedTag((current) => (current === tag ? null : tag));
   }, []);
+
+  const handleOpenScrap = useCallback((id: string) => {
+    selectScrap(id);
+    openModal('detail');
+    recordView(id);
+  }, [selectScrap, openModal, recordView]);
+
+  // Current filters for smart view saving
+  const currentFilters = useMemo((): SmartViewFilters => ({
+    types: selectedType ? [selectedType] : undefined,
+    tags: selectedTag ? [selectedTag] : undefined,
+  }), [selectedType, selectedTag]);
+
+  const handleSaveAsSmartView = useCallback(async (name: string, filters: SmartViewFilters) => {
+    await createSmartView({ name, filters });
+  }, [createSmartView]);
 
   // Filter scraps
   const filteredScraps = useMemo(() => {
@@ -110,13 +162,36 @@ export function HomePage() {
           <EmptyCollection />
         ) : (
           <div className="space-y-6">
+            {/* Rediscover widget */}
+            <RediscoverWidget
+              scraps={scraps}
+              onScrapClick={handleOpenScrap}
+            />
+
+            {/* Activity heat map */}
+            <ActivityHeatMap
+              scraps={scraps}
+              months={3}
+              onDayClick={(_date, scrapIds) => {
+                // For now just open the first scrap from that day
+                if (scrapIds.length > 0) {
+                  handleOpenScrap(scrapIds[0]);
+                }
+              }}
+            />
+
             {/* Filter bar */}
             <FilterBar
               scraps={scraps}
               selectedType={selectedType}
               selectedTag={selectedTag}
-              onTypeChange={setSelectedType}
-              onTagChange={setSelectedTag}
+              onTypeChange={handleTypeChange}
+              onTagChange={handleTagChange}
+              onSaveAsSmartView={
+                (selectedType || selectedTag)
+                  ? () => setIsSaveFilterDialogOpen(true)
+                  : undefined
+              }
             />
 
             {/* Results */}
@@ -125,8 +200,8 @@ export function HomePage() {
                 <p className="text-slate-500">No scraps match your filters</p>
                 <button
                   onClick={() => {
-                    setSelectedType(null);
-                    setSelectedTag(null);
+                    handleTypeChange(null);
+                    handleTagChange(null);
                   }}
                   className="mt-2 text-sm text-indigo-600 hover:underline"
                 >
@@ -192,9 +267,15 @@ export function HomePage() {
         {selectedScrap && (
           <ScrapDetail
             scrap={selectedScrap}
+            allScraps={scraps}
             onEdit={() => openModal('edit')}
             onDelete={handleDeleteScrap}
             onClose={handleCloseDetail}
+            onToggleReadStatus={handleToggleReadStatus}
+            onRelatedScrapClick={(id) => {
+              selectScrap(id);
+              recordView(id);
+            }}
           />
         )}
       </Modal>
@@ -214,6 +295,14 @@ export function HomePage() {
           />
         )}
       </Modal>
+
+      {/* Save Filter Dialog */}
+      <SaveFilterDialog
+        isOpen={isSaveFilterDialogOpen}
+        onClose={() => setIsSaveFilterDialogOpen(false)}
+        onSave={handleSaveAsSmartView}
+        currentFilters={currentFilters}
+      />
     </>
   );
 }

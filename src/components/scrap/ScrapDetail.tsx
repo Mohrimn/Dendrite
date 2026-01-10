@@ -1,13 +1,19 @@
+import { useMemo } from 'react';
 import type { Scrap } from '@/types';
 import { Badge, Button } from '@/components/ui';
+import { RelatedScrapCard } from './RelatedScrapCard';
+import { findRelatedScraps } from '@/services/relatedness';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 interface ScrapDetailProps {
   scrap: Scrap;
+  allScraps?: Scrap[];
   onEdit?: () => void;
   onDelete?: () => void;
   onClose?: () => void;
+  onToggleReadStatus?: () => void;
+  onRelatedScrapClick?: (scrapId: string) => void;
 }
 
 const typeColors: Record<string, string> = {
@@ -18,9 +24,22 @@ const typeColors: Record<string, string> = {
   note: '#ec4899',
 };
 
-export function ScrapDetail({ scrap, onEdit, onDelete, onClose }: ScrapDetailProps) {
+export function ScrapDetail({
+  scrap,
+  allScraps = [],
+  onEdit,
+  onDelete,
+  onClose,
+  onToggleReadStatus,
+  onRelatedScrapClick,
+}: ScrapDetailProps) {
+  const relatedScraps = useMemo(
+    () => findRelatedScraps(scrap, allScraps, 5),
+    [scrap, allScraps]
+  );
+
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -37,9 +56,14 @@ export function ScrapDetail({ scrap, onEdit, onDelete, onClose }: ScrapDetailPro
             </p>
           </div>
         </div>
-        {scrap.isPinned && (
-          <Badge color="#f59e0b">Pinned</Badge>
-        )}
+        <div className="flex gap-2">
+          {scrap.type === 'link' && scrap.readStatus === 'unread' && (
+            <Badge color="#3b82f6">Unread</Badge>
+          )}
+          {scrap.isPinned && (
+            <Badge color="#f59e0b">Pinned</Badge>
+          )}
+        </div>
       </div>
 
       {/* URL for links */}
@@ -119,11 +143,35 @@ export function ScrapDetail({ scrap, onEdit, onDelete, onClose }: ScrapDetailPro
         </div>
       )}
 
+      {/* Related Scraps */}
+      {relatedScraps.length > 0 && (
+        <div>
+          <h3 className="mb-2 text-sm font-medium text-slate-700">Related</h3>
+          <div className="space-y-2">
+            {relatedScraps.map(({ scrap: related, reasons }) => (
+              <RelatedScrapCard
+                key={related.id}
+                scrap={related}
+                reasons={reasons}
+                onClick={() => onRelatedScrapClick?.(related.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex justify-between border-t border-slate-100 pt-4">
-        <Button variant="danger" onClick={onDelete}>
-          Delete
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="danger" onClick={onDelete}>
+            Delete
+          </Button>
+          {scrap.type === 'link' && (
+            <Button variant="secondary" onClick={onToggleReadStatus}>
+              {scrap.readStatus === 'read' ? 'Mark Unread' : 'Mark Read'}
+            </Button>
+          )}
+        </div>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={onClose}>
             Close

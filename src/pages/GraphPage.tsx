@@ -31,6 +31,7 @@ export function GraphPage() {
   const scraps = useStore((state) => state.scraps);
   const updateScrap = useStore((state) => state.updateScrap);
   const deleteScrap = useStore((state) => state.deleteScrap);
+  const toggleReadStatus = useStore((state) => state.toggleReadStatus);
   const [selectedScrapId, setSelectedScrapId] = useState<string | null>(null);
   const [hoveredScrapId, setHoveredScrapId] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<ScrapType | null>(null);
@@ -108,6 +109,12 @@ export function GraphPage() {
       setSelectedScrapId(null);
     }
   }, [selectedScrap, deleteScrap]);
+
+  const handleToggleReadStatus = useCallback(async () => {
+    if (selectedScrap) {
+      await toggleReadStatus(selectedScrap.id);
+    }
+  }, [selectedScrap, toggleReadStatus]);
 
   const handleZoomIn = useCallback(() => {
     graphRef.current?.zoomIn();
@@ -315,9 +322,15 @@ export function GraphPage() {
                 )}
                 <ScrapDetail
                   scrap={selectedScrap}
+                  allScraps={scraps}
                   onEdit={handleEdit}
                   onDelete={handleDeleteScrap}
                   onClose={handleCloseDetail}
+                  onToggleReadStatus={handleToggleReadStatus}
+                  onRelatedScrapClick={(id) => {
+                    setSelectedScrapId(id);
+                    graphRef.current?.zoomToNode(id);
+                  }}
                 />
               </div>
             )}

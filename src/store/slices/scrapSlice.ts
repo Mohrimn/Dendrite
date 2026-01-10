@@ -13,6 +13,8 @@ export interface ScrapSlice {
   deleteScrap: (id: string) => Promise<void>;
   selectScrap: (id: string | null) => void;
   togglePin: (id: string) => Promise<void>;
+  toggleReadStatus: (id: string) => Promise<void>;
+  recordView: (id: string) => Promise<void>;
 }
 
 export const createScrapSlice: StateCreator<ScrapSlice> = (set, get) => ({
@@ -110,5 +112,30 @@ export const createScrapSlice: StateCreator<ScrapSlice> = (set, get) => ({
         ),
       }));
     }
+  },
+
+  toggleReadStatus: async (id) => {
+    const scrap = get().scraps.find((s) => s.id === id);
+    if (scrap && scrap.type === 'link') {
+      await scrapRepository.toggleReadStatus(id);
+      set((state) => ({
+        scraps: state.scraps.map((s) =>
+          s.id === id
+            ? { ...s, readStatus: s.readStatus === 'read' ? 'unread' : 'read' }
+            : s
+        ),
+      }));
+    }
+  },
+
+  recordView: async (id) => {
+    await scrapRepository.recordView(id);
+    set((state) => ({
+      scraps: state.scraps.map((s) =>
+        s.id === id
+          ? { ...s, lastViewedAt: new Date(), viewCount: (s.viewCount || 0) + 1 }
+          : s
+      ),
+    }));
   },
 });

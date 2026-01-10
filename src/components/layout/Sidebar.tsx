@@ -2,10 +2,10 @@
 // ABOUTME: Provides main app navigation with animated active states
 
 import { useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useStore } from '@/store';
+import { useStore, useSmartViews } from '@/store';
 import { useIsMobile } from '@/hooks';
 
 const navItems = [
@@ -73,8 +73,26 @@ export function Sidebar() {
   const sidebarOpen = useStore((state) => state.sidebarOpen);
   const toggleSidebar = useStore((state) => state.toggleSidebar);
   const setSidebarOpen = useStore((state) => state.setSidebarOpen);
+  const activeSmartViewId = useStore((state) => state.activeSmartViewId);
+  const setActiveSmartView = useStore((state) => state.setActiveSmartView);
+  const deleteSmartView = useStore((state) => state.deleteSmartView);
+  const smartViews = useSmartViews();
   const isMobile = useIsMobile();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSmartViewClick = (id: string) => {
+    setActiveSmartView(id);
+    navigate('/');
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
+
+  const handleDeleteSmartView = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    await deleteSmartView(id);
+  };
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -153,7 +171,7 @@ export function Sidebar() {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 space-y-1 p-3">
+                <nav className="flex-1 space-y-1 overflow-y-auto p-3">
                   {navItems.map((item) => (
                     <NavLink
                       key={item.to}
@@ -172,6 +190,43 @@ export function Sidebar() {
                       <span className="text-sm font-medium">{item.label}</span>
                     </NavLink>
                   ))}
+
+                  {/* Smart Views */}
+                  {smartViews.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-slate-100">
+                      <div className="px-3 mb-2 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        Smart Views
+                      </div>
+                      {smartViews.map((view) => (
+                        <button
+                          key={view.id}
+                          onClick={() => handleSmartViewClick(view.id)}
+                          className={cn(
+                            'group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5',
+                            'transition-colors duration-200',
+                            activeSmartViewId === view.id
+                              ? 'bg-indigo-50 text-indigo-700'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          )}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                          </svg>
+                          <span className="flex-1 text-left text-sm font-medium truncate">{view.name}</span>
+                          <button
+                            onClick={(e) => handleDeleteSmartView(e, view.id)}
+                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-200 rounded transition-opacity"
+                            aria-label={`Delete ${view.name}`}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M18 6 6 18" />
+                              <path d="m6 6 12 12" />
+                            </svg>
+                          </button>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </nav>
 
                 {/* Footer */}
@@ -246,7 +301,7 @@ export function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 p-3">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -286,6 +341,43 @@ export function Sidebar() {
               )}
             </NavLink>
           ))}
+
+          {/* Smart Views */}
+          {smartViews.length > 0 && !sidebarCollapsed && (
+            <div className="mt-4 pt-4 border-t border-slate-100">
+              <div className="px-3 mb-2 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                Smart Views
+              </div>
+              {smartViews.map((view) => (
+                <button
+                  key={view.id}
+                  onClick={() => handleSmartViewClick(view.id)}
+                  className={cn(
+                    'group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5',
+                    'transition-colors duration-200',
+                    activeSmartViewId === view.id
+                      ? 'bg-indigo-50 text-indigo-700'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  )}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                  </svg>
+                  <span className="flex-1 text-left text-sm font-medium truncate">{view.name}</span>
+                  <button
+                    onClick={(e) => handleDeleteSmartView(e, view.id)}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-200 rounded transition-opacity"
+                    aria-label={`Delete ${view.name}`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6 6 18" />
+                      <path d="m6 6 12 12" />
+                    </svg>
+                  </button>
+                </button>
+              ))}
+            </div>
+          )}
         </nav>
 
         {/* Footer */}

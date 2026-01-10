@@ -2,8 +2,9 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { createScrapSlice, type ScrapSlice } from './slices/scrapSlice';
 import { createUISlice, type UISlice } from './slices/uiSlice';
+import { createSmartViewSlice, type SmartViewSlice } from './slices/smartViewSlice';
 
-export type StoreState = ScrapSlice & UISlice;
+export type StoreState = ScrapSlice & UISlice & SmartViewSlice;
 
 export const useStore = create<StoreState>()(
   devtools(
@@ -11,6 +12,7 @@ export const useStore = create<StoreState>()(
       (...args) => ({
         ...createScrapSlice(...args),
         ...createUISlice(...args),
+        ...createSmartViewSlice(...args),
       }),
       {
         name: 'knowledge-store',
@@ -35,5 +37,12 @@ export const useSelectedScrap = () =>
   useStore((state) =>
     state.selectedScrapId
       ? state.scraps.find((s) => s.id === state.selectedScrapId)
+      : null
+  );
+export const useSmartViews = () => useStore((state) => state.smartViews);
+export const useActiveSmartView = () =>
+  useStore((state) =>
+    state.activeSmartViewId
+      ? state.smartViews.find((sv) => sv.id === state.activeSmartViewId)
       : null
   );

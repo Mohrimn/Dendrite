@@ -1,5 +1,7 @@
 export type ScrapType = 'thought' | 'link' | 'image' | 'snippet' | 'note';
 
+export type ReadStatus = 'unread' | 'read';
+
 export interface LinkMeta {
   title: string;
   description: string;
@@ -35,6 +37,9 @@ export interface Scrap {
   isPinned: boolean;
   color?: string;
   searchableText: string;
+  readStatus?: ReadStatus;
+  lastViewedAt?: Date;
+  viewCount?: number;
 }
 
 export type CreateScrapInput = Pick<Scrap, 'type' | 'title' | 'content'> & {

@@ -7,3 +7,4 @@ export { TagInput } from './TagInput';
 export { LinkPreview } from './LinkPreview';
 export { ImageUpload } from './ImageUpload';
 export { FilterBar } from './FilterBar';
+export { RelatedScrapCard } from './RelatedScrapCard';

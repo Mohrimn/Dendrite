@@ -10,6 +10,7 @@ interface FilterBarProps {
   selectedTag: string | null;
   onTypeChange: (type: ScrapType | null) => void;
   onTagChange: (tag: string | null) => void;
+  onSaveAsSmartView?: () => void;
 }
 
 const typeOptions: { type: ScrapType; label: string; color: string }[] = [
@@ -26,6 +27,7 @@ export function FilterBar({
   selectedTag,
   onTypeChange,
   onTagChange,
+  onSaveAsSmartView,
 }: FilterBarProps) {
   // Get all unique tags from scraps
   const allTags = useMemo(() => {
@@ -146,8 +148,29 @@ export function FilterBar({
               }}
               className="ml-2 text-xs text-slate-500 hover:text-slate-700 underline"
             >
-              Clear filters
+              Clear
             </button>
+            {onSaveAsSmartView && (
+              <button
+                onClick={onSaveAsSmartView}
+                className="ml-2 inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-100 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Save View
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
