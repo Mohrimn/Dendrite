@@ -1,6 +1,8 @@
 import { db } from '../schema';
+import { tagRepository } from './tagRepository';
 import type { Scrap, ScrapType, CreateScrapInput, UpdateScrapInput, ReadStatus } from '@/types';
 import { v4 as uuid } from 'uuid';
+import { slugify } from '@/lib/utils';
 
 function buildSearchableText(scrap: Partial<Scrap>): string {
   return [
@@ -14,6 +16,36 @@ function buildSearchableText(scrap: Partial<Scrap>): string {
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
+}
+
+function buildTagSet(tags?: string[]): Set<string> {
+  return new Set((tags || []).map((tag) => tag.trim()).filter(Boolean));
+}
+
+async function updateTagUsage(previous?: Scrap, next?: Scrap): Promise<void> {
+  const previousTags = buildTagSet(previous?.tags);
+  const previousAutoTags = buildTagSet(previous?.autoTags);
+  const nextTags = buildTagSet(next?.tags);
+  const nextAutoTags = buildTagSet(next?.autoTags);
+
+  const previousAll = new Set([...previousTags, ...previousAutoTags]);
+  const nextAll = new Set([...nextTags, ...nextAutoTags]);
+
+  const added = [...nextAll].filter((tag) => !previousAll.has(tag));
+  const removed = [...previousAll].filter((tag) => !nextAll.has(tag));
+
+  for (const tag of added) {
+    const isSystem = !nextTags.has(tag);
+    const ensured = await tagRepository.ensureTag(tag, isSystem);
+    await tagRepository.incrementUsage(ensured.id);
+  }
+
+  for (const tag of removed) {
+    const existing = await tagRepository.getBySlug(slugify(tag));
+    if (existing) {
+      await tagRepository.decrementUsage(existing.id);
+    }
+  }
 }
 
 export const scrapRepository = {
@@ -40,6 +72,7 @@ export const scrapRepository = {
     scrap.searchableText = buildSearchableText(scrap);
 
     await db.scraps.add(scrap);
+    await updateTagUsage(undefined, scrap);
     return scrap;
   },
 
@@ -51,10 +84,15 @@ export const scrapRepository = {
     updatedScrap.searchableText = buildSearchableText(updatedScrap);
 
     await db.scraps.update(id, updatedScrap);
+    await updateTagUsage(scrap, updatedScrap);
   },
 
   async delete(id: string): Promise<void> {
-    await db.transaction('rw', [db.scraps, db.connections], async () => {
+    await db.transaction('rw', [db.scraps, db.connections, db.tags], async () => {
+      const scrap = await db.scraps.get(id);
+      if (scrap) {
+        await updateTagUsage(scrap, undefined);
+      }
       await db.connections.where('sourceId').equals(id).delete();
       await db.connections.where('targetId').equals(id).delete();
       await db.scraps.delete(id);
@@ -82,7 +120,7 @@ export const scrapRepository = {
   },
 
   async getPinned(): Promise<Scrap[]> {
-    return db.scraps.where('isPinned').equals(1).toArray();
+    return db.scraps.where('isPinned').equals(1).or('isPinned').equals(1).toArray();
   },
 
   async getRecent(limit = 20): Promise<Scrap[]> {

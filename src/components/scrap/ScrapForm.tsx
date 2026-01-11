@@ -76,6 +76,8 @@ const typeColors: Record<ScrapType, string> = {
   note: '#ec4899',
 };
 
+const MAX_TAGS = 10;
+
 export function ScrapForm({ onSubmit, onCancel, isLoading, initialData }: ScrapFormProps) {
   const [type, setType] = useState<ScrapType>(initialData?.type ?? 'thought');
   const [title, setTitle] = useState(initialData?.title ?? '');
@@ -129,6 +131,17 @@ export function ScrapForm({ onSubmit, onCancel, isLoading, initialData }: ScrapF
     if (type === 'image') return !!imageData;
     return content.trim().length > 0;
   }, [type, url, content, imageData]);
+
+  const handleSuggestionClick = useCallback(
+    (suggestion: string) => {
+      const normalized = suggestion.trim().toLowerCase();
+      if (!normalized) return;
+      if (tags.includes(normalized)) return;
+      if (tags.length >= MAX_TAGS) return;
+      setTags([...tags, normalized]);
+    },
+    [tags]
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -232,6 +245,7 @@ export function ScrapForm({ onSubmit, onCancel, isLoading, initialData }: ScrapF
           suggestions={tagSuggestions}
           onChange={setTags}
           placeholder="Add tags (press Enter or comma)"
+          maxTags={MAX_TAGS}
         />
         {tagSuggestions.length > 0 && tags.length < 5 && (
           <div className="mt-2 flex items-center gap-2">
@@ -241,7 +255,7 @@ export function ScrapForm({ onSubmit, onCancel, isLoading, initialData }: ScrapF
                 <button
                   key={suggestion}
                   type="button"
-                  onClick={() => setTags([...tags, suggestion])}
+                  onClick={() => handleSuggestionClick(suggestion)}
                   className={cn(
                     'rounded-full px-2 py-0.5 text-xs',
                     'bg-slate-100 text-slate-600 hover:bg-slate-200',

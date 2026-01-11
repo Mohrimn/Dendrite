@@ -51,29 +51,49 @@ function findTagConnections(scraps: Scrap[]): Connection[] {
   const connections: Connection[] = [];
   const now = new Date();
 
-  for (let i = 0; i < scraps.length; i++) {
-    for (let j = i + 1; j < scraps.length; j++) {
-      const scrapA = scraps[i];
-      const scrapB = scraps[j];
+  const tagMap = new Map<string, string[]>();
 
-      // Find shared tags
-      const allTagsA = [...scrapA.tags, ...scrapA.autoTags];
-      const allTagsB = [...scrapB.tags, ...scrapB.autoTags];
-      const sharedTags = allTagsA.filter((tag) => allTagsB.includes(tag));
-
-      if (sharedTags.length > 0) {
-        // Strength based on number of shared tags
-        const strength = Math.min(1, sharedTags.length * 0.3);
-        connections.push({
-          id: uuid(),
-          sourceId: scrapA.id,
-          targetId: scrapB.id,
-          type: 'tag',
-          strength,
-          createdAt: now,
-        });
+  for (const scrap of scraps) {
+    const allTags = new Set([...scrap.tags, ...scrap.autoTags]);
+    for (const tag of allTags) {
+      const list = tagMap.get(tag);
+      if (list) {
+        list.push(scrap.id);
+      } else {
+        tagMap.set(tag, [scrap.id]);
       }
     }
+  }
+
+  const pairCounts = new Map<string, { sourceId: string; targetId: string; count: number }>();
+
+  for (const scrapIds of tagMap.values()) {
+    for (let i = 0; i < scrapIds.length; i++) {
+      for (let j = i + 1; j < scrapIds.length; j++) {
+        const a = scrapIds[i];
+        const b = scrapIds[j];
+        const [sourceId, targetId] = a < b ? [a, b] : [b, a];
+        const key = `${sourceId}|${targetId}`;
+        const existing = pairCounts.get(key);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          pairCounts.set(key, { sourceId, targetId, count: 1 });
+        }
+      }
+    }
+  }
+
+  for (const { sourceId, targetId, count } of pairCounts.values()) {
+    const strength = Math.min(1, count * 0.3);
+    connections.push({
+      id: uuid(),
+      sourceId,
+      targetId,
+      type: 'tag',
+      strength,
+      createdAt: now,
+    });
   }
 
   return connections;

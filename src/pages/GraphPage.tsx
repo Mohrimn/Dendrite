@@ -17,6 +17,7 @@ import { EmptyState, GraphIllustration } from '@/components/empty-states';
 import type { ScrapType, CreateScrapInput } from '@/types';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks';
+import { ROUTES } from '@/constants/routes';
 
 const TYPE_OPTIONS: { type: ScrapType; label: string; color: string }[] = [
   { type: 'thought', label: 'Thoughts', color: '#8b5cf6' },
@@ -147,7 +148,7 @@ export function GraphPage() {
               description="Your knowledge graph will appear here once you create some scraps. Start capturing your ideas!"
               action={{
                 label: 'Create scraps',
-                onClick: () => navigate('/'),
+                onClick: () => navigate(ROUTES.HOME),
               }}
             />
           </div>

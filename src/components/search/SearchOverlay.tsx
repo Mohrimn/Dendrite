@@ -7,6 +7,7 @@ import { searchService, type SearchResult, type SearchOptions } from '@/services
 import { useKeyboardShortcut } from '@/hooks';
 import { cn } from '@/lib/utils';
 import type { ScrapType } from '@/types';
+import { ROUTES } from '@/constants/routes';
 
 const TYPE_ICONS: Record<ScrapType, JSX.Element> = {
   thought: (
@@ -75,9 +76,7 @@ export function SearchOverlay() {
 
   // Index scraps when they change
   useEffect(() => {
-    if (scraps.length > 0) {
-      searchService.indexAll(scraps);
-    }
+    searchService.indexAll(scraps);
   }, [scraps]);
 
   // Focus input when opened
@@ -156,7 +155,7 @@ export function SearchOverlay() {
     (result: SearchResult) => {
       selectScrap(result.id);
       toggleSearch();
-      navigate('/');
+      navigate(ROUTES.HOME);
     },
     [selectScrap, toggleSearch, navigate]
   );
@@ -183,7 +182,12 @@ export function SearchOverlay() {
   const highlightMatch = useCallback((text: string, terms: string[]) => {
     if (!terms.length) return text;
 
-    const regex = new RegExp(`(${terms.join('|')})`, 'gi');
+    const escapedTerms = terms
+      .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .filter(Boolean);
+    if (escapedTerms.length === 0) return text;
+
+    const regex = new RegExp(`(${escapedTerms.join('|')})`, 'gi');
     const parts = text.split(regex);
 
     return parts.map((part, i) =>

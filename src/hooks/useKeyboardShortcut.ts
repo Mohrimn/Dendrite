@@ -8,6 +8,13 @@ interface ShortcutOptions {
   preventDefault?: boolean;
 }
 
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  const tagName = target.tagName;
+  return tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT';
+}
+
 export function useKeyboardShortcut(
   options: ShortcutOptions,
   callback: () => void
@@ -16,6 +23,9 @@ export function useKeyboardShortcut(
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
+      if (isEditableTarget(event.target)) {
+        return;
+      }
       const modifierChecks = {
         ctrl: event.ctrlKey,
         alt: event.altKey,

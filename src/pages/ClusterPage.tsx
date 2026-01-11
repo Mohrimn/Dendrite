@@ -9,6 +9,7 @@ import { clusterEngine, type ClusterEngineResult } from '@/services/clustering';
 import { EmptyState, ClusterIllustration } from '@/components/empty-states';
 import type { Cluster } from '@/types';
 import { cn } from '@/lib/utils';
+import { ROUTES } from '@/constants/routes';
 
 export function ClusterPage() {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ export function ClusterPage() {
   const handleScrapClick = (scrapId: string) => {
     selectScrap(scrapId);
     openModal('detail');
-    navigate('/');
+    navigate(ROUTES.HOME);
   };
 
   if (scraps.length < 2) {
@@ -67,7 +68,7 @@ export function ClusterPage() {
             description="Add at least 2 scraps to see automatic thematic clusters. The more scraps you add, the better the clustering will be."
             action={{
               label: 'Add scraps',
-              onClick: () => navigate('/'),
+              onClick: () => navigate(ROUTES.HOME),
             }}
           />
         </div>

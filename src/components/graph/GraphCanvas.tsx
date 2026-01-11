@@ -65,6 +65,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
     const initialCameraPosition = useRef({ x: 0, y: 0, z: 100 });
 
     const [isInitialized, setIsInitialized] = useState(false);
+    const [isHoveringNode, setIsHoveringNode] = useState(false);
 
     // Animation state for smooth camera transitions
     const cameraAnimationRef = useRef<{
@@ -156,6 +157,12 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
       }
       for (const line of edgeLines.values()) {
         scene.edgeGroup.remove(line);
+        line.geometry.dispose();
+        if (Array.isArray(line.material)) {
+          line.material.forEach((material) => material.dispose());
+        } else {
+          line.material.dispose();
+        }
       }
       nodeMeshes.clear();
       edgeLines.clear();
@@ -337,6 +344,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
           }
 
           hoveredNodeRef.current = newHoveredId;
+          setIsHoveringNode(Boolean(newHoveredId));
           onNodeHover?.(newHoveredId);
         }
       },
@@ -428,7 +436,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
       <div
         ref={containerRef}
         className={`w-full h-full ${className}`}
-        style={{ cursor: hoveredNodeRef.current ? 'pointer' : 'grab' }}
+        style={{ cursor: isHoveringNode ? 'pointer' : 'grab' }}
       />
     );
   }

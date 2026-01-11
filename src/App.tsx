@@ -8,6 +8,7 @@ import { AppShell } from '@/components/layout';
 import { SearchOverlay } from '@/components/search';
 import { PWAPrompt } from '@/components/PWAPrompt';
 import { Skeleton } from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -56,10 +57,10 @@ function AnimatedRoutes() {
       >
         <Suspense fallback={<PageLoader />}>
           <Routes location={location}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/graph" element={<GraphPage />} />
-            <Route path="/clusters" element={<ClusterPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route path={ROUTES.HOME} element={<HomePage />} />
+            <Route path={ROUTES.GRAPH} element={<GraphPage />} />
+            <Route path={ROUTES.CLUSTERS} element={<ClusterPage />} />
+            <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
           </Routes>
         </Suspense>
       </motion.div>

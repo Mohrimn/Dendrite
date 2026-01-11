@@ -7,10 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useStore, useSmartViews } from '@/store';
 import { useIsMobile } from '@/hooks';
+import { ROUTES } from '@/constants/routes';
 
 const navItems = [
   {
-    to: '/',
+    to: ROUTES.HOME,
     label: 'Scraps',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -22,7 +23,7 @@ const navItems = [
     ),
   },
   {
-    to: '/clusters',
+    to: ROUTES.CLUSTERS,
     label: 'Clusters',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -40,7 +41,7 @@ const navItems = [
     ),
   },
   {
-    to: '/graph',
+    to: ROUTES.GRAPH,
     label: 'Graph',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -57,7 +58,7 @@ const navItems = [
     ),
   },
   {
-    to: '/settings',
+    to: ROUTES.SETTINGS,
     label: 'Settings',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -83,7 +84,7 @@ export function Sidebar() {
 
   const handleSmartViewClick = (id: string) => {
     setActiveSmartView(id);
-    navigate('/');
+    navigate(ROUTES.HOME);
     if (isMobile) {
       setSidebarOpen(false);
     }
