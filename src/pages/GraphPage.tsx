@@ -210,8 +210,8 @@ export function GraphPage() {
               {/* Filter controls - always visible on desktop, collapsible on mobile */}
               {(!isMobile || showFilters) && (
                 <div className={cn(
-                  'bg-slate-800/90 backdrop-blur-sm rounded-lg p-3 space-y-3',
-                  isMobile && 'absolute top-14 right-0 z-10 min-w-[200px] max-w-[280px]'
+                  'bg-slate-800/90 backdrop-blur-sm rounded-lg p-2 space-y-2',
+                  isMobile ? 'absolute top-14 right-0 z-10 min-w-[200px] max-w-[280px]' : 'max-w-[180px]'
                 )}>
                   <div className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Filter

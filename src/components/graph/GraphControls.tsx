@@ -17,17 +17,16 @@ export function GraphControls({
   className = '',
 }: GraphControlsProps) {
   return (
-    <div className={`flex flex-col gap-1.5 bg-slate-800/90 backdrop-blur-sm rounded-lg p-1.5 ${className}`}>
+    <div className={`flex flex-col gap-1 lg:gap-0.5 bg-slate-800/90 backdrop-blur-sm rounded-lg p-1.5 lg:p-1 ${className}`}>
       <button
         onClick={onZoomIn}
         title="Zoom In"
         aria-label="Zoom In"
-        className="w-10 h-10 p-0 flex items-center justify-center rounded-md text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-600 transition-colors touch-manipulation"
+        className="w-10 h-10 lg:w-7 lg:h-7 p-0 flex items-center justify-center rounded-md text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-600 transition-colors touch-manipulation"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
+          className="w-5 h-5 lg:w-4 lg:h-4"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -45,12 +44,11 @@ export function GraphControls({
         onClick={onZoomOut}
         title="Zoom Out"
         aria-label="Zoom Out"
-        className="w-10 h-10 p-0 flex items-center justify-center rounded-md text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-600 transition-colors touch-manipulation"
+        className="w-10 h-10 lg:w-7 lg:h-7 p-0 flex items-center justify-center rounded-md text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-600 transition-colors touch-manipulation"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
+          className="w-5 h-5 lg:w-4 lg:h-4"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -67,12 +65,11 @@ export function GraphControls({
         onClick={onResetView}
         title="Reset View"
         aria-label="Reset View"
-        className="w-10 h-10 p-0 flex items-center justify-center rounded-md text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-600 transition-colors touch-manipulation"
+        className="w-10 h-10 lg:w-7 lg:h-7 p-0 flex items-center justify-center rounded-md text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-600 transition-colors touch-manipulation"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
+          className="w-5 h-5 lg:w-4 lg:h-4"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -88,12 +85,11 @@ export function GraphControls({
         onClick={onReheat}
         title="Reheat Simulation"
         aria-label="Reheat Simulation"
-        className="w-10 h-10 p-0 flex items-center justify-center rounded-md text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-600 transition-colors touch-manipulation"
+        className="w-10 h-10 lg:w-7 lg:h-7 p-0 flex items-center justify-center rounded-md text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-600 transition-colors touch-manipulation"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
+          className="w-5 h-5 lg:w-4 lg:h-4"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
